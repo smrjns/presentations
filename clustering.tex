@@ -1,0 +1,504 @@
+% This text is proprietary.
+% It's a part of presentation made by myself.
+% It may not used commercial.
+% The noncommercial use such as private and study is free
+% Sep. 2005 
+% Author: Sascha Frank 
+% University Freiburg 
+% www.informatik.uni-freiburg.de/~frank/
+
+
+\documentclass{beamer}
+\begin{document}
+\title{Clustering}   
+\author{Smrutiranjan Sahu} 
+\date{\today} 
+
+\frame{\titlepage} 
+
+\frame{\frametitle{Table of contents}\tableofcontents} 
+
+
+\section{Introduction} 
+\frame{\frametitle{Introduction} 
+\begin{itemize}
+\item Used for discovering unknown subgroups in data.
+\item Used for exploratory analysis and/or as a component of a hierarchical supervised learning pipeline \\
+distinct classifiers or regression models are trained for each cluster
+
+\end{itemize}  
+}
+
+
+\section{Metrics} 
+\subsection{Norms}
+\frame{\frametitle{Norms}
+\begin{itemize}
+\item ${l_{p}norm: ||x||_{p}=\sqrt[p]{\sum\limits _{i=1}^{n}|x_{i}|^{p}}
+}$
+
+\item $l_{0}$ norm: Number of non-zero elements in a vector 
+$||x||_{0}= \sum(i|x_{i}\neq0)$
+
+\item $l_{1}$ norm: Manhattan Norm (sum of absolute distance) 
+$||x||_{1}=\sum\limits _{i=1}^{n}|x_{i}|$
+
+\item $l_{2}$ norm: Euclidean Norm(vector Distance)
+$||x||_{2}=\sqrt{x_{1}^{2}+x_{2}^{2}+x_{3}^{2}+..+x_{n}^{2}}=\sqrt{x^{T}x}$
+
+\item $l_{\infty} norm: \max(|x_{i}|)$
+
+\end{itemize} 
+}
+
+
+\subsection{Distance Measures}
+\frame{\frametitle{DistanceMeasures}
+$d(x,y)=||x-y||$	
+\begin{itemize}
+\item Mahalanobis distance: $d(\vec{x},\vec{y})=\sqrt{(\vec{x}-\vec{y})^{T}S^{-1}(\vec{x}-\vec{y})}$
+
+S is the Covariance matrix \\
+It accounts for the fact that the variances in each direction are different. 
+Normalizes based on a covariance matrix (between variables) to make the distance metric scale-invariant
+
+\item Euclidean distance($l_2$): $d_{e}(x,y)=\sqrt{\sum\limits _{i=1}^{n}(x_{i}-y_{i})^{2}}$ \\
+
+Mahalanobis distance for Gaussian (uncorrelated variables with unit variance) \\
+Covariance: identity matrix.
+
+\item Normalized Euclidean distance: $d_{M}(x,y)=\sqrt{\frac{\sum\limits _{i=1}^{n}(x_{i}-y_{i})^{2}}{s_{i}^{2}}}$ 
+
+$s_{i}$: SD of the xi and yi over the sample \\
+Covariance: diagonal matrix
+
+\end{itemize}
+}
+
+\frame{\frametitle{DistanceMeasures2}
+\begin{itemize}
+	
+\item Sum of squared distance: $d_{s}(x,y)=\sum\limits _{i=1}^{n}(x_{i}-y_{i})^{2}$
+
+\item Manhattan distance($l_1$): $d_{m}(x,y)=\sum\limits _{i=1}^{n}|x_{i}-y_{i}|$ \\
+often good for sparse features eg: text
+
+\item Chebyshev distance(Max norm): $d_{\infty}(x,y)=\max _{i}(|x_{i}-y_{i}|)$ \\
+ assumes only the most significant dimension is relevant
+
+\item Vector/Cosine distance metric: \\ $d_{v}(x,y)= \dfrac{\ensuremath{|x||y|}}{xy}$ = $\frac {{\sqrt {\sum \limits _{i=1}^{n}{x_{i}^{2}}}}{\sqrt {\sum \limits _{i=1}^{n}{x_{i}^{2}}}}}{\sum \limits _{i=1}^{n}{x_{i}y_{i}}}$\\
+where $|x|$: euclidian norm \\
+invariant to global scalings of the signal
+
+\end{itemize}
+}
+
+\section{Algorithms} 
+\frame{\frametitle{Algorithms}
+\begin{itemize}
+	\item Partition Based
+	\item Distribution Based
+	\item Density Based
+	\item Graph Based
+	\item Grid Based
+\end{itemize}
+}
+\subsection{Partition Based}
+\frame{\frametitle{Partition Based}
+	\begin{itemize}
+		\item K-Means
+		\item K-Medoids
+		\item Hierarchical
+	\end{itemize}
+}
+\subsubsection{K-Means}
+\frame{\frametitle{K-Means}
+	
+		
+		K-Means/Centroids: Minimize $l_2$ mahalanobis/euclidean/sum of square distances to cluster centers/means 
+		
+		Objective: ${\displaystyle \underset{s}{arg\,min}\sum_{i=1}^{k}\sum_{\mathbf{x}\in S_{i}}\left\Vert \mathbf{x}-\mu_{i}\right\Vert ^{2}}$
+		
+		
+		Steps:
+		\begin{enumerate}
+			\item Initialize $\mu_{1},...,\mu_{k}$ (randomly or manually)		
+			\item Repeat until no change(less than threshold) in $\mu_{1},...,\mu_{k}$ \\
+			classify $x_{1},...,x_{n}$ to each’s nearest $\mu_{i}$
+				
+			\item recalculate $\mu_{1},...,\mu_{k}$				
+		\end{enumerate}
+		Pros:
+		\begin{itemize}
+			\item Simple to implement.
+			\item Fast for low dimensional data.	
+			\item Can find subclusters for large k.		
+		\end{itemize}
+		Cons:
+		\begin{itemize}
+			\item Not guaranteed to find a globally optimal solution. Run multiple times on a given dataset, for best clustering result.	
+			\item restricted to globular data which has the notion of a center
+			\item Final clusters area sensitive to the selection of initial centroids.
+			\item Can produce empty clusters
+		\end{itemize}
+}
+
+\subsubsection{K-Medoids}
+\frame{\frametitle{K-Medoids}
+	
+	
+	K-Medoids: Minimize manhattan($l_1$)/any distance to cluster medoids. \\
+	
+	Works with an arbitrary metrics of distances between datapoints instead of sum of squares.
+	
+	Medoid: Center is chosen from original datapoints.	
+	
+	Used when a mean or centroid cannot be defined such as 3-D trajectories or in the gene expression context.
+}
+
+\subsubsection{Spectral}
+\frame{\frametitle{Spectral}
+	
+Use spectrum (eigenvalues) of the similarity matrix of the data to perform dimensionality reduction before clustering(k-means) in fewer dimensions.\\
+For non-convex eg: nested circles in 2D
+}
+
+\subsubsection{Hierarchical}
+\frame{\frametitle{Hierarchical}
+	
+Create a hierarchical decomposition of the set of data (or objects) using some criterion.
+Produce nested sets of clusters.
+\begin{itemize}
+\item Agglomerative: bottom up approach \\
+Each observation starts in its own cluster, and pairs of clusters are merged as one moves up the hierarchy. 
+
+\item Divisive: top down approach \\
+All observations start in one cluster, and splits are performed recursively as one moves down the hierarchy. 
+\end{itemize}
+
+Linkage criteria: determines the metric used for the merge strategy
+\begin{itemize}
+	\item Ward: minimizes the sum of squared differences within all clusters (a variance-minimizing approach, similar to k-means)
+	
+	\item Complete, Average, Single: minimizes the maximum/average/minimum pair-wise distance between observations of pairs of clusters.
+	(Min: susceptible to noise/outliers
+	Max/average: may not work well with non-globular clusters)
+\end{itemize}
+
+Dissimilarity measure: Euclidean or Correlation-based distance \\
+
+
+}
+
+\subsubsection{Birch}
+\frame{\frametitle{Birch: balanced iterative reducing and clustering using hierarchies}
+	
+	Steps:
+	\begin{enumerate}
+		\item Every new sample is inserted into the root of the Clustering Feature Tree.
+		
+		\item  It is then clubbed together with the subcluster that has the centroid closest to the new sample.
+		
+		\item This is done recursively till it ends up at the subcluster of the leaf of the tree has the closest centroid.
+	\end{enumerate}
+	 
+}
+
+\subsection{Distribution-based}
+\subsubsection{GMM}
+\frame{\frametitle{GMM: Gaussian Mixture Models}
+	
+	
+	Composite distribution whereby points are drawn from one of k Gaussian sub-distributions, each with its own probability. \\
+	Uses EM algorithm to induce the maximum-likelihood model given a set of samples. 
+	
+	initialModel: starting point/random \\
+	convergenceTol: Maximum change in log-likelihood at which we consider convergence achieved. 
+		
+}
+\subsubsection{LDA}
+\frame{\frametitle{LDA: Latent Dirichlet allocation}
+	
+Topics and documents both exist in a feature space, where feature vectors are vectors of word counts.
+
+ Uses a function based on a statistical model of how text documents are generated(Not distance metrics).
+
+ By assigning query data points to the multivariate normal components/clusters that maximize the component posterior probability given the data. 
+ 
+ Can accommodate clusters that have different sizes and correlation structures within them.
+ 
+ Optimization: Expectation Maximization
+	
+}
+
+\subsection{Density Based}
+\frame{\frametitle{Density Based}
+	Density: No of points within a specified radius.\\
+	Views clusters as areas of high density separated by areas of low density.\\
+}
+\subsubsection{DBScan}
+\frame{\frametitle{DBScan: Density-based spatial clustering of applications with noise}
+	Flat clustering of 1 level (like kmeans)\\
+	Finds core samples of high density and expands clusters from them.\\
+	 Good for data(of any shape) containing clusters of similar density. \\
+	Non-deterministic: A non-core sample(distance lower than eps) to two core samples in different clusters assigned to whichever cluster is generated first, but the core samples will always belong to the same clusters. \\
+	Can use ball trees and kd-trees to determine the neighborhood of points
+	
+	
+}
+
+\subsubsection{Optics}
+\frame{\frametitle{Optics: Ordering points to identify the clustering structure}
+	 Hierarchical clustering of nested levels
+	
+}
+
+\subsection{Graph Based}
+\subsubsection{PIC}
+\frame{\frametitle{PIC: Power iteration clustering}
+		
+	Clustering vertices of a graph given pairwise similarities as edge properties. 
+	
+	Computes a pseudo-eigenvector of the normalized affinity matrix of the graph via power iteration and uses it to cluster vertices.
+	
+}
+
+\subsubsection{HCS}
+\frame{\frametitle{HCS: Highly Connected Subgraphs}
+	
+	
+}
+
+\subsection{Grid Based}
+\frame{\frametitle{Grid Based}
+	Based on a multiple-level granularity structure
+	
+}
+
+\section{Evaluation}
+\frame{\frametitle{Evaluation/Validation}
+	\begin{itemize}
+		\item Internal
+		\item External
+	\end{itemize}
+}
+	
+\subsection{Internal}
+\frame{\frametitle{Internal Evaluation}
+	Desc:
+	\begin{itemize}
+		\item Based on the data that was clustered itself. 
+		
+		\item Assign the best score to the algorithm that produces clusters with high similarity within a cluster and low similarity between clusters.
+		
+		\item Validity as measured by such an index/criterion depends on the claim that some kind of structure exists. \\
+		
+		Eg: k-means clustering can only find convex clusters, and many evaluation indexes assume convex clusters of data set (not ideal for nonconvex data set).
+	\end{itemize}
+	Cons:
+	\begin{itemize}
+		\item Biased towards algorithms that use the same cluster model.\\
+		Eg: k-means is distance based, and distance based criteria will overrate
+		\item Compares algo performs better than another, but not that it produces more valid results than another
+		\item High scores on an internal measure do not necessarily result in effective IR applications
+	\end{itemize}
+	
+}
+
+\subsubsection{WSSSE}
+\frame{\frametitle{WSSSE (Within Set Sum of Squared Error)}
+		
+	$D_{k}=\sum\limits _{x_{i}\epsilon C_{k}}\sum\limits _{x_{j}\epsilon C_{k}}||x_{i}-x_{j}||^{2}
+	=2n_{k}\sum\limits _{x_{i}\epsilon C_{k}}||x_{i}-\mu_{k}||^{2}$ \newline
+	Sum of intra-cluster distances between points $n_{k}$ in cluster $C_{k}$ \newline
+	
+	$W_{k}=\sum\limits _{k=1}^{k}\frac{1}{2n_{k}}D_{k}$
+	(normalized intra-cluster sums of squares)\\
+	Within cluster dispersion \newline
+	
+	
+	Elbow method: naive solution based on intra-cluster variance
+	
+	Plot: percentage of variance explained(F-test=grp-var/tot-var) vs number of clusters 
+	
+	Optimal k is usually one where there is an “elbow” in the WSSSE graph.
+}
+
+
+\subsubsection{GAP}
+\frame{\frametitle{GAP statistics}
+	 Way to standardize the graph by comparing $logW_{k}$ with its Expectation $E_{n}^{*}\{\log W_{k}\}$ under a null reference distribution. \newline
+		 
+	$Gap_{n}(k)=E_{n}^{*}\{\log W_{k}\}-logW_{k}$
+	
+ 
+	 $E_{n}^{*}$: average of x copies $\log W_{k}^{*}$ Monte Carlo sample \newline
+	 
+	 	 
+	 k = smallest k such that $\mathrm{Gap}(k)\geq\mathrm{Gap}(k+1)-s_{k+1}$\\
+	 k = value for which $logW_{k}$ falls the farthest below this reference value $E_{n}^{*}$ in curve \\	 	 
+	 $s_{k}=sd(k)*\sqrt{1+1/x}$ :Simulation error \newline
+	 	 
+	 For globular, Gaussian-distributed, mildly disjoint data distributions.
+	 
+	 Ref: http://www.web.stanford.edu/~hastie/Papers/gap.pdf
+}
+
+\subsubsection{Davies–Bouldin index}
+\frame{\frametitle{Davies–Bouldin index}
+	${\displaystyle DB={\frac {1}{n}}\sum _{i=1}^{n}\max _{j\neq i}\left({\frac {\sigma _{i}+\sigma _{j}}{d(c_{i},c_{j})}}\right)}$
+	
+	n: number of clusters \\
+	$ c_{x}$: centroid of cluster x \\
+	$ \sigma _{x}$: average distance of all elements in cluster x to centroid $c_{x}$ \\
+	$ d(c_{i},c_{j})$: distance between centroids $c_{i}$ and $c_{j}$. \newline
+	
+	Smaller the score Better the Algo
+}
+
+\subsubsection{Dunn index}
+\frame{\frametitle{Dunn index}
+	${\displaystyle D={\frac {\min _{1\leq i<j\leq n}d(i,j)}{\max _{1\leq k\leq n}d^{\prime }(k)}}\,,}$ \\
+	
+	d(i,j): inter-cluster distance between clusters i and j \\
+	d'(k): intra-cluster distance of cluster k \newline
+	
+	Smaller the score Better the Algo
+}
+
+\subsubsection{Silhouette}
+\frame{\frametitle{Silhouette}
+	${\displaystyle s(i)={\frac {b(i)-a(i)}{\max\{a(i),b(i)\}}}}$ \\
+	${\displaystyle s(i)={\begin{cases}1-a(i)/b(i),&{\mbox{if }}a(i)<b(i)\\0,&{\mbox{if }}a(i)=b(i)\\b(i)/a(i)-1,&{\mbox{if }}a(i)>b(i)\\\end{cases}}}$
+	
+	
+	$a_{i}$: average distance from the ith point to the other points in the same cluster as i 
+	
+	$b_{i}$: minimum average distance from the ith point to points in a different cluster, minimized over clusters. \newline
+	
+	$S_{i}$: -1 to +1. \\	
+	High value indicates that i is well-matched to its own cluster, and poorly-matched to neighboring clusters 
+	
+	appropriate: if most points have a high/+ve silhouette value 
+	
+	too many/few: if many points have a low/-ve silhouette value
+
+}
+\subsection{External}
+\frame{\frametitle{External Evaluation}
+	Desc:
+	\begin{itemize}
+		\item Based on data that was not used for clustering(external benchmarks/known class labels: gold standard, created by humans). 
+		
+		\item Measure how close the clustering is to the predetermined benchmark classes
+		
+		\item Computes how similar the resulting clusters are to the benchmark classes/clusters
+		
+		\item No assumption made on cluster structure.
+		
+		semisupervised
+	\end{itemize}
+	
+}
+\subsubsection{Rand index}
+\frame{\frametitle{Rand index (Adjusted)}
+	${\displaystyle RI={\frac {TP+TN}{TP+FN+TN+FP}}}$ \\
+	Measure of the percentage of correct decisions made by the algorithm.
+	\newline
+	
+	Cons: 
+	\begin{itemize}
+		\item False positives and false negatives are equally weighted \\
+		\item No bounded range and no guarrentee of random (uniform) label assignments have a RI score close to 0.0 (eg: number of clusters = number of samples) \newline
+	\end{itemize}
+	${\displaystyle ARI={\frac {RI - E[RI]}{max(RI) - E[RI]}}}$
+}
+
+\subsubsection{F-measure}
+\frame{\frametitle{F-measure}
+	${\displaystyle F_{\beta }={\frac {(\beta ^{2}+1)\cdot P\cdot R}{\beta ^{2}\cdot P+R}}}$ \\
+	${\displaystyle P={\frac {TP}{TP+FP}}}$\\
+	${\displaystyle R={\frac {TP}{TP+FN}}}$\\
+	
+	${\displaystyle \beta \geq 0}$\newline
+	
+	${\displaystyle \beta =0} \implies {\displaystyle F_{0}=P}$. 
+	i.e: recall has no impact on the F-measure. \\
+	Increasing ${\displaystyle \beta }$ allocates an increasing amount of weight to recall in the final F-measure
+	
+	F-measure is the harmonic mean of precision and recall 	
+}
+
+\subsubsection{Jaccard index}
+\frame{\frametitle{Jaccard index}
+	${\displaystyle J(A,B)={\frac {|A\cap B|}{|A\cup B|}}={\frac {TP}{TP+FP+FN}}}$ \newline
+	${\displaystyle 0 \leq J \leq 1}$ \\
+	J=1: identical \\
+	J=0: no common element
+	number of unique elements common to both sets divided by the total number of unique elements in both sets.
+		
+}
+
+\subsubsection{FM index}
+\frame{\frametitle{Fowlkes-Mallows index}
+	${\displaystyle FM={\sqrt {{\frac {TP}{TP+FP}}\cdot {\frac {TP}{TP+FN}}}}}$ \newline
+	
+	FM index is the geometric mean of precision and recall 	
+}
+
+\subsubsection{MI Index}
+\frame{\frametitle{Mutual Information}
+	
+	
+	Information theoretic measure of how much information is shared between a clustering and a ground-truth classification. \\
+	Can detect a non-linear similarity between two clusterings. \newline
+	
+	Entropy: amount of uncertainty for a partition set\\
+	${\displaystyle H(X)= \mathrm {E} [\mathrm {I} (X)]=\mathrm {E} [-\ln(\mathrm {P} (X))] = \sum _{x=1}^{|X|}P(x)\log P(x) = \sum _{x=1}^{Nx}\frac{Nx}{N}\log \frac{Nx}{N}}$ 	\\
+	P(x): probability of an object from X falls into class $X_x$ \newline
+	
+	${\displaystyle MI(U,V)=\sum _{u=1}^{|U|}\sum _{v=1}^{|V|}P(u,v)\log {\left({\frac {P(u,v)}{P(u)\,P(v)}}\right)}}$
+	
+	$P(u, v) = |X_x \cap Y_y|/N $ =  probability of an object falls into both class $X_x$ and $Y_xy$
+}
+
+\frame{\frametitle{Normaized \& Adjusted \& Standardized Mutual Information}
+
+	${\displaystyle NMI = \frac {MI}{\sqrt{(H(U).H(V))}} }$ \\
+	
+	${\displaystyle AMI = \frac {MI - E[MI]}{\sqrt{(H(U).H(V))} - E[MI]} = \frac {MI - E[MI]}{max(H(U), H(V) - E[MI]} }$ \\
+	
+	${\displaystyle SMI = \frac {MI - E[MI]}{\sqrt{Var(MI)}} }$ \\
+	Ref: http://www.jmlr.org/proceedings/papers/v32/romano14.pdf
+}
+
+\subsubsection{V Measure}
+\frame{\frametitle{V Measure}
+	homogeneity: each cluster contains only members of a single class.\\
+	completeness: all members of a given class are assigned to the same cluster.\newline
+
+	${\displaystyle v = 2 . \frac{h.c}{h+c} }$ \\
+	${\displaystyle h = 1 - \frac{H(C|K)}{H(C)} }$ \\
+	${\displaystyle c = 1 - \frac{H(K|C)}{H(K)} }$ \\
+	${\displaystyle H(C|K)=\sum _{c=1}^{|C|}\sum _{k=1}^{|K|}\frac{n_{c,k}}{n}\log {\left({\frac{n_{c,k}}{n}}\right)}}$ \newline
+	
+	Pros:
+	score is between 0(bad) to 1(perfect)\\
+	Bad score can be qualitatively analyzed by h \& c \\
+	Cons: Random labeling won’t yield zero scores especially when the number of clusters is large
+	
+}
+
+\section{Comparision} 
+\frame{\frametitle{Comparision}
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+\textbf{Algorithm} & \textbf{Complexity} & \textbf{Scalability} & \textbf{Usecase} & \textbf{Metric used} \\\hline
+k-means & O(I * K * m * n)  &  &  & \\\hline
+DBSCAN & O($m^2$)  &  &  & \\\hline
+
+\end{tabular}}
+
+
+\end{document}
+}{den}
